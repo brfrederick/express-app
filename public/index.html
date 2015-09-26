@@ -1,17 +1,50 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <style>
+          
+            body {
+              background-image: linear-gradient(135deg, rgba(0, 0, 0, 0) 84px, #d95b43 84px, #d95b43 100px, #ecd078 100px, #ecd078 106px, #c02942 106px, #c02942 120px, #ecd078 121px, #ecd078 127px, #542437 127px, #542437 142px, #ecd078 142px, #ecd078 148px, #53777a 148px, #53777a 163px, #ecd078 163px, #ecd078 168px, #d95b43 169px), linear-gradient(135deg, #d95b43 15px, #d95b43, #ecd078 15px, #ecd078 21px, #c02942 21px, #c02942 36px, #ecd078 36px, #ecd078 42px, #542437 42px, #542437 57.5px, #ecd078 57px, #ecd078 63px, #53777a 63px, #53777a 78px, #ecd078 78px, #ecd078 84px, rgba(0, 0, 0, 0) 84px, rgba(0, 0, 0, 0) 99px);
+              background-size: 120px 120px;
+
+                color:white;
+                font-size: 6vmin;
+                text-align: center;
+                font-family: 'Permanent Marker', cursive;
+                text-shadow: -5px 0 black, 0 5px black, 5px 0 black, 0 -5px black;
+
+            }
+
+            body{
+                max-height: 10vh;
+                margin-top: 40vh;
+            }
+        </style>
+        
         <script src="/socket.io/socket.io.js"></script>
         <script>
-          var socket = io.connect();
-          socket.on('news', function (data) {
-            console.log(data);
-            socket.emit('my other event', { my: 'data' });
-          });
+            console.log('starting');
+            var socket = io.connect();
+
+            socket.on('update', function (data) {
+                console.log(data);
+                
+                document.querySelector('#ticker').innerHTML = data.amt;
+                
+            }); 
+            
+            socket.on('clear', function (data) {
+                document.querySelector('#ticker').innerHTML = 0;
+            });
+            
+            setInterval(function(){
+                console.log('tick');
+                socket.emit('tick', {amt: 5});
+            }, 3000);
         </script>
     </head>
 
     <body>
-        <h1>hello world</h1>
+        <h1>Oh look! A random ticker thing: <span id="ticker">0</span></h1>
     </body>
 </html>
