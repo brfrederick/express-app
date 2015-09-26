@@ -1,0 +1,24 @@
+{
+  "name": "express-app",
+  "version": "1.0.0",
+  "description": "simple express and socket io app",
+  "main": "./src/app.js",
+  "scripts": {
+    "start" : "node ./src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brfrederick/express-app.git"
+  },
+  "author": "Braxton Frederick",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/brfrederick/express-app/issues"
+  },
+  "homepage": "https://github.com/brfrederick/express-app#readme",
+  "dependencies": {
+    "express": "^4.13.3",
+    "socket.io": "^1.3.7"
+  }
+}
