@@ -36,25 +36,43 @@
         
         <script src="/socket.io/socket.io.js"></script>
         <script>
-            
+            // Socket.io vars
             var socket;
+            
+            // Canvas vars
             var canvas;
             var ctx;            
+            var canvasBuffer;
+            var ctxBuffer;
             
+            // App vars
             var user = 'user' + (Math.floor((Math.random() * 1000)) + 1);
             var entities = {};
             
             // Draws entities to screen
             function draw(){
+                // Clear the canvas
                 ctx.clearRect(0,0,canvas.width, canvas.height);
                 
                 var keys = Object.keys(entities);
                 
                 for(var i =0; i < keys.length; i++){
-                    var params = entities[keys[i]];
+                    var entity = entities[keys[i]];
                     
-                    ctx.fillStyle = params.style;
-                    ctx.fillRect( params.x, params.y, params.width, params.height);
+                    
+                    var img = new Image();
+                    
+                    img.onload = function(){
+                        ctx.save();
+                        ctx.globalCompositeOperation = "source-over";
+                        ctx.drawImage(img, entity.x, entity.y, entity.width, entity.height);
+                        ctx.restore;
+                    };
+                    
+                    img.src = entity.imgData;
+                    
+                    //ctx.fillStyle = params.style;
+                    //ctx.fillRect( params.x, params.y, params.width, params.height);
                 }
             };
             
@@ -69,18 +87,33 @@
             
             // Connect the sockets and event listeners
             function init(){
-                socket = io.connect();
+                // Setup canvas
                 canvas = document.querySelector('canvas');
                 ctx = canvas.getContext('2d');
                 
+                canvasBuffer = document.createElement('canvas');
+                canvasBuffer.height = canvas.height;
+                canvasBuffer.width = canvas.width;
+                ctxBuffer = canvasBuffer.getContext('2d');
+                
+                
+                // Setup socket io
+                socket = io.connect();
+                
                 socket.on('connect', function() {
-                    socket.emit('objectUpdate', {
+                    var entity = {
                         user: user,
                         time: new Date().getTime(), 
                         x: (Math.random() * (canvas.width * .9)), y: (Math.random() * (canvas.height * .9)), 
                         width: (Math.random() * 10) + 5, height: (Math.random() * 10) + 5,
-                        style: getRandomRGB()
-                    });
+                        style: getRandomRGB(),
+                    };
+                    
+                    ctx.fillStyle = entity.style;
+                    ctxBuffer.fillRect(entity.x, entity.y, entity.width, entity.height);
+                    entity.imgData = canvas.toDataURL();
+                    
+                    socket.emit('objectUpdate', entity);
                 });
                 
                 socket.on('update', function(data){
