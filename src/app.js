@@ -11,6 +11,10 @@ app.get('/', function(req,res){
     res.sendFile(path.resolve(__dirname + '/../public/index.html'));
 });
 
+app.get('/notCody.gif', function(req,res){
+    res.sendFile(path.resolve(__dirname + '/../public/notCody.gif'));
+});
+
 var tickerVal = 0;
 
 io.on('connection', function (socket) {
@@ -19,7 +23,6 @@ io.on('connection', function (socket) {
     socket.join('room1');
     
     socket.on('objectUpdate', function (data) {
-        console.log(data);
         io.sockets.in('room1').emit('update', data);
     });
     
