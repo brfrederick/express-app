@@ -59,21 +59,12 @@
                 for(var i =0; i < keys.length; i++){
                     var entity = entities[keys[i]];
                     
+                    ctx.save();
+                    ctx.globalCompositeOperation = "source-over";
+                    ctx.drawImage(entity.img, entity.x, entity.y, entity.width, entity.height);                    
+                    ctx.restore;
                     
-                    var img = new Image();
-                    
-                    img.onload = function(){
-                        ctx.save();
-                        ctx.globalCompositeOperation = "source-over";
-                        ctx.drawImage(img, entity.x, entity.y, entity.width, entity.height);
-                        ctx.restore;
-                    };
-                    
-                    img.src = entity.imgData;
-                    
-                    //ctx.fillStyle = params.style;
-                    //ctx.fillRect( params.x, params.y, params.width, params.height);
-                }
+                    }
             };
             
             // Utility function to generate random RBG
@@ -104,28 +95,35 @@
                     var entity = {
                         user: user,
                         time: new Date().getTime(), 
-                        x: (Math.random() * (canvas.width * .9)), y: (Math.random() * (canvas.height * .9)), 
-                        width: (Math.random() * 10) + 5, height: (Math.random() * 10) + 5,
+                        x: (Math.random() * (canvas.width * .7)), y: (Math.random() * (canvas.height * .7)), 
+                        width: (Math.random() * 50) + 20, height: (Math.random() * 50) + 20,
                         style: getRandomRGB(),
                     };
                     
-                    ctx.fillStyle = entity.style;
+                    ctxBuffer.fillStyle = entity.style;
                     ctxBuffer.fillRect(entity.x, entity.y, entity.width, entity.height);
-                    entity.imgData = canvas.toDataURL();
+                    entity.imgData = canvasBuffer.toDataURL();
                     
                     socket.emit('objectUpdate', entity);
                 });
                 
                 socket.on('update', function(data){
                     
-                    if(!entities[data.user]){
+                    if(!entities[data.user] || data.time > entities[data.user].time){
                         entities[data.user] = data;
-                    }
-                    else if( data.time > entities[data.user].time ){
-                        entities[data.user] = data;
-                    }
+                        
+                        var img = new Image()
+                        img.onload = function(){
+                            console.log('image loaded');
+                                                        
+                            entities[data.user] = data;
+                            entities[data.user].img = img;
+                            draw();
+                        };
+
+                        img.src = data.imgData;
+                    }              
                     
-                    draw();
                 });
                 
                 // Keyboard Input
