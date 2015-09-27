@@ -18,10 +18,9 @@ io.on('connection', function (socket) {
 
     socket.join('room1');
     
-    socket.on('tick', function (data) {
+    socket.on('addObject', function (data) {
         console.log(data);
-        tickerVal += data.amt;
-        io.sockets.in('room1').emit('update', {amt: tickerVal});
+        io.sockets.in('room1').emit('objectAdded', data);
     });
     
     socket.on('disconnect', function(data) {

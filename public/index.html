@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>Are your eyes bleeding yet?</title>
+        
         <style>
           
             body {
@@ -12,8 +14,7 @@
                 text-align: center;
                 font-family: 'Permanent Marker', cursive;
                 text-shadow: -5px 0 black, 0 5px black, 5px 0 black, 0 -5px black;
-                max-height: 10vh;
-                margin-top: 40vh;
+                margin-top: 4em;
             }
 
         </style>
@@ -25,14 +26,52 @@
             var canvas;
             var ctx;            
             
+            var entities = {};
+            
+            // Draws entities to screen
+            function draw(){
+                ctx.clearRect(0,0,canvas.width, canvas.height);
+                
+                var keys = Object.keys(entities);
+                
+                for(var i =0; i < keys.length; i++){
+                    var params = entities[keys[i]];
+                    
+                    ctx.fillStyle = params.style;
+                    ctx.fillRect( params.x, params.y, params.width, params.height);
+                }
+            };
+            
+            // Utility function to generate random RBG
+            function getRandomRGB(){
+                var r = Math.floor(Math.random()* 256);
+                var g = Math.floor(Math.random()* 256);
+                var b = Math.floor(Math.random()* 256);
+
+                return 'rgb(' + r +', ' + g + ',' + b +')';
+            }
+            
+            // Connect the sockets and event listeners
             function init(){
                 socket = io.connect();
                 canvas = document.querySelector('canvas');
                 ctx = canvas.getContext('2d');
                 
-                socket.on('connect', function() {});
+                socket.on('connect', function() {
+                    socket.emit('addObject', {
+                        time: new Date().getTime(), 
+                        x: (Math.random() * 500), y: (Math.random() * 500), 
+                        width: (Math.random() * 60) + 10, height: (Math.random() * 50) + 15,
+                        style: getRandomRGB()
+                    });
+                });
                 
-                socket.on('update', function(){});
+                socket.on('objectAdded', function(data){
+                    console.log('a new object was added');
+                    
+                    entities[data.time] = data;
+                    draw();
+                });
             };
             
             window.onload = init;
