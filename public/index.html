@@ -12,39 +12,35 @@
                 text-align: center;
                 font-family: 'Permanent Marker', cursive;
                 text-shadow: -5px 0 black, 0 5px black, 5px 0 black, 0 -5px black;
-
-            }
-
-            body{
                 max-height: 10vh;
                 margin-top: 40vh;
             }
+
         </style>
         
         <script src="/socket.io/socket.io.js"></script>
         <script>
-            console.log('starting');
-            var socket = io.connect();
-
-            socket.on('update', function (data) {
-                console.log(data);
-                
-                document.querySelector('#ticker').innerHTML = data.amt;
-                
-            }); 
             
-            socket.on('clear', function (data) {
-                document.querySelector('#ticker').innerHTML = 0;
-            });
+            var socket;
+            var canvas;
+            var ctx;            
             
-            setInterval(function(){
-                console.log('tick');
-                socket.emit('tick', {amt: 5});
-            }, 3000);
+            function init(){
+                socket = io.connect();
+                canvas = document.querySelector('canvas');
+                ctx = canvas.getContext('2d');
+                
+                socket.on('connect', function() {});
+                
+                socket.on('update', function(){});
+            };
+            
+            window.onload = init;
+            
         </script>
     </head>
 
     <body>
-        <h1>Oh look! A random ticker thing: <span id="ticker">0</span></h1>
+        <canvas id="canvas" height="600" width="600">Please upgrade your browser.</canvas>
     </body>
 </html>
