@@ -18,9 +18,9 @@ io.on('connection', function (socket) {
 
     socket.join('room1');
     
-    socket.on('addObject', function (data) {
+    socket.on('objectUpdate', function (data) {
         console.log(data);
-        io.sockets.in('room1').emit('objectAdded', data);
+        io.sockets.in('room1').emit('update', data);
     });
     
     socket.on('disconnect', function(data) {

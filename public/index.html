@@ -26,6 +26,7 @@
             var canvas;
             var ctx;            
             
+            var user = 'user' + (Math.floor((Math.random() * 1000)) + 1);
             var entities = {};
             
             // Draws entities to screen
@@ -58,7 +59,8 @@
                 ctx = canvas.getContext('2d');
                 
                 socket.on('connect', function() {
-                    socket.emit('addObject', {
+                    socket.emit('objectUpdate', {
+                        user: user,
                         time: new Date().getTime(), 
                         x: (Math.random() * 500), y: (Math.random() * 500), 
                         width: (Math.random() * 60) + 10, height: (Math.random() * 50) + 15,
@@ -66,11 +68,50 @@
                     });
                 });
                 
-                socket.on('objectAdded', function(data){
-                    console.log('a new object was added');
+                socket.on('update', function(data){
                     
-                    entities[data.time] = data;
+                    if(!entities[data.user]){
+                        entities[data.user] = data;
+                    }
+                    else if( data.time > entities[data.user].time ){
+                        entities[data.user] = data;
+                    }
+                    
                     draw();
+                });
+                
+                // Keyboard Input
+                
+                document.addEventListener('keydown', function(e){
+                    console.log(e.keyCode);
+                    
+                    var modified = false;
+                    var entity = JSON.parse(JSON.stringify(entities[user]));
+                    
+                    if(e.keyCode == '68'){
+                        entity.x += 4;
+                        modified = true;
+                    }
+                    
+                    if(e.keyCode == '65'){
+                        entity.x -= 4;
+                        modified = true;
+                    }
+                    
+                    if(e.keyCode == '87'){
+                        entity.y -= 4;
+                        modified = true;
+                    }
+                    
+                    if(e.keyCode == '83'){
+                        entity.y += 4;
+                        modified = true;
+                    }
+                    
+                    if( modified ){
+                        entity.time = new Date().getTime();
+                        socket.emit('objectUpdate', entity);
+                    }
                 });
             };
             
